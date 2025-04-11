@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../../../node_modules/react-i18next';
 
 const Loader = ({ size = 'medium', fullScreen = false }) => {
   const { t } = useTranslation();

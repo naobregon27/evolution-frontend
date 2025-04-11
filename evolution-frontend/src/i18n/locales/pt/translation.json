@@ -1,0 +1,132 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "search": "Pesquisar",
+    "loading": "Carregando...",
+    "actions": "Ações",
+    "confirm": "Confirmar",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "auth": {
+    "login": "Entrar",
+    "logout": "Sair",
+    "email": "Email",
+    "password": "Senha",
+    "forgot_password": "Esqueceu sua senha?",
+    "register": "Registrar",
+    "login_error": "Erro de login",
+    "login_success": "Login realizado com sucesso"
+  },
+  "navigation": {
+    "dashboard": "Painel",
+    "users": "Usuários",
+    "settings": "Configurações",
+    "profile": "Meu Perfil",
+    "home": "Início"
+  },
+  "users": {
+    "title": "Gestão de Usuários",
+    "create_user": "Criar Usuário",
+    "edit_user": "Editar Usuário",
+    "delete_user": "Excluir Usuário",
+    "user_details": "Detalhes do Usuário",
+    "name": "Nome",
+    "email": "Email",
+    "role": "Função",
+    "status": "Status",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "last_login": "Último acesso",
+    "confirm_delete": "Tem certeza que deseja excluir este usuário?",
+    "user_created": "Usuário criado com sucesso",
+    "user_updated": "Usuário atualizado com sucesso",
+    "user_deleted": "Usuário excluído com sucesso"
+  },
+  "settings": {
+    "title": "Configurações",
+    "preferences": "Preferências do Usuário",
+    "security": "Segurança",
+    "notifications": {
+      "title": "Notificações",
+      "description": "Receber notificações do sistema"
+    },
+    "dark_mode": {
+      "title": "Modo Escuro",
+      "description": "Mudar para tema escuro"
+    },
+    "language": {
+      "title": "Idioma",
+      "es": "Espanhol",
+      "en": "Inglês",
+      "pt": "Português"
+    },
+    "auto_logout": {
+      "title": "Logout Automático",
+      "description": "Sair devido à inatividade"
+    },
+    "session_timeout": {
+      "title": "Tempo de Inatividade (minutos)",
+      "15_min": "15 minutos",
+      "30_min": "30 minutos",
+      "1_hour": "1 hora",
+      "2_hours": "2 horas"
+    },
+    "save_success": "Configurações salvas com sucesso"
+  },
+  "locales": {
+    "title": "Gestão de Locais",
+    "create_local": "Criar Local",
+    "edit_local": "Editar Local",
+    "delete_local": "Excluir Local",
+    "local_details": "Detalhes do Local",
+    "no_locales": "Nenhum local registrado.",
+    "add_new_instruction": "Clique em \"Novo Local\" para adicionar um.",
+    "no_results": "Nenhum local encontrado",
+    "search_placeholder": "Pesquisar locais...",
+    "filters": {
+      "all": "Todos",
+      "active": "Ativos",
+      "inactive": "Inativos"
+    },
+    "table": {
+      "name": "Nome",
+      "address": "Endereço",
+      "phone": "Telefone",
+      "email": "Email",
+      "status": "Status"
+    },
+    "actions": {
+      "view_details": "Ver detalhes"
+    },
+    "form": {
+      "name": "Nome do Local",
+      "address": "Endereço",
+      "phone": "Telefone",
+      "email": "Email",
+      "active": "Ativo",
+      "details": "Detalhes",
+      "location": "Localização",
+      "operation_hours": "Horário de Funcionamento",
+      "contact_info": "Informações de Contato"
+    },
+    "confirmation": {
+      "delete": "Tem certeza que deseja excluir este local?",
+      "success_create": "Local criado com sucesso",
+      "success_update": "Local atualizado com sucesso",
+      "success_delete": "Local excluído com sucesso"
+    }
+  },
+  "errors": {
+    "not_found": "Página não encontrada",
+    "server_error": "Erro do servidor",
+    "forbidden": "Acesso proibido",
+    "unauthorized": "Não autorizado",
+    "validation_error": "Erro de validação",
+    "unknown_error": "Erro desconhecido"
+  }
+} 

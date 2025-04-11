@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Clases base para el modo oscuro */
+@layer base {
+  .dark {
+    @apply bg-gray-900 text-white;
+  }
+  
+  .dark-mode {
+    color-scheme: dark;
+  }
+  
+  .light-mode {
+    color-scheme: light;
+  }
+}
+
+/* Utilidades para componentes en modo oscuro */
+@layer utilities {
+  .dark-bg-surface {
+    @apply dark:bg-gray-800;
+  }
+  
+  .dark-bg-elevated {
+    @apply dark:bg-gray-700;
+  }
+  
+  .dark-border {
+    @apply dark:border-gray-700;
+  }
+}
+
+/* Define un espacio para utilidades personalizadas */
+@layer utilities {
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+} 

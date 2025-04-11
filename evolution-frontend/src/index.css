@@ -1,0 +1,299 @@
+@import './tailwind.css';
+
+/* Estilos básicos */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Estilos para el modo claro (predeterminado) */
+html {
+  background-color: #ffffff;
+  color: #213547;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #213547;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilo para todos los componentes en modo claro */
+.app-container,
+.card,
+.panel,
+.header,
+.footer,
+.layout,
+.modal,
+.dropdown,
+.menu {
+  background-color: #ffffff;
+  color: #213547;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Mantener el sidebar y navbar con colores consistentes en ambos modos */
+.sidebar {
+  background-image: linear-gradient(to bottom, #4f46e5, #4338ca);
+  color: white;
+}
+
+.navbar {
+  background-image: linear-gradient(to right, #4f46e5, #4338ca);
+  color: white;
+}
+
+/* Estilos para el modo oscuro */
+html.dark {
+  background-color: #121212;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.dark body {
+  background-color: #121212;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+/* Estilo para todos los componentes en modo oscuro */
+.dark .app-container,
+.dark .card,
+.dark .panel,
+.dark .header,
+.dark .footer,
+.dark .layout,
+.dark .modal,
+.dark .dropdown,
+.dark .menu {
+  background-color: #1e1e1e;
+  color: rgba(255, 255, 255, 0.87);
+  border-color: #333;
+}
+
+/* Estilos específicos para componentes en modo oscuro */
+.dark main {
+  background-color: #1a1a1a;
+}
+
+.dark select,
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark textarea {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.dark table {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.dark table th {
+  background-color: #333;
+}
+
+.dark table tr:nth-child(even) {
+  background-color: #333;
+}
+
+.dark table tr:hover {
+  background-color: #444;
+}
+
+/* Estilos para tarjetas en modo oscuro */
+.dark .card {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+/* Estilos para botones en modo oscuro */
+.dark button:not(.sidebar button):not(.navbar button) {
+  background-color: #333;
+  color: white;
+  border-color: #555;
+}
+
+.dark button:hover:not(.sidebar button):not(.navbar button) {
+  background-color: #444;
+}
+
+/* Estilos para toggle switches */
+.dark .toggle-switch {
+  background-color: #4f46e5;
+}
+
+/* Estilos para configuración */
+.dark .settings-option {
+  border-color: #444;
+}
+
+.dark .settings-section {
+  border-color: #444;
+}
+
+/* Variables CSS para modo oscuro y claro */
+:root {
+  --color-text-primary: #213547;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-accent: #f3f4f6;
+  --color-border: #e5e7eb;
+  --color-input-bg: #ffffff;
+  --color-input-border: #d1d5db;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  
+  /* Colores para sidebar y navbar */
+  --sidebar-bg-from: #4f46e5;  /* indigo-600 */
+  --sidebar-bg-to: #4338ca;    /* indigo-700 */
+  --sidebar-text: #ffffff;
+}
+
+/* Variables CSS para modo oscuro */
+html.dark {
+  --color-text-primary: rgba(255, 255, 255, 0.87);
+  --color-text-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-muted: rgba(255, 255, 255, 0.5);
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #1e1e1e;
+  --color-bg-accent: #2a2a2a;
+  --color-border: #444;
+  --color-input-bg: #2a2a2a;
+  --color-input-border: #444;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para elementos específicos en modo oscuro */
+.dark .settings-card {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+.dark .dashboard-card {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+.dark .profile-card {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+.dark .switch-toggle {
+  background-color: #4f46e5;
+}
+
+/* Estilos comunes */
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: border-color 0.25s, background-color 0.3s;
+}
+
+.dark button {
+  background-color: #333;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Reemplazamos media queries con clases para Tailwind */
+/* Comentamos esta parte para que no interfiera con nuestra estrategia de 'class'
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+*/
+
+/* Estilos personalizados adicionales */
+@layer components {
+  .counter {
+    @apply px-4 text-2xl font-bold;
+  }
+  
+  .card {
+    @apply p-4 rounded-xl border border-gray-300 dark:border-gray-700 transition-colors duration-300;
+  }
+  
+  .logo {
+    @apply h-24 p-6 will-change-[filter] transition-[filter] duration-300;
+  }
+  
+  .logo:hover {
+    @apply drop-shadow-[0_0_2em_#646cffaa];
+  }
+  
+  .logo.react:hover {
+    @apply drop-shadow-[0_0_2em_#61dafbaa];
+  }
+  
+  .read-the-docs {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+  
+  /* Componentes personalizados para la configuración */
+  .settings-section {
+    @apply p-4 border-b border-gray-200 dark:border-gray-700;
+  }
+  
+  .settings-option {
+    @apply flex items-center justify-between py-3;
+  }
+  
+  .toggle-switch {
+    @apply relative inline-block w-12 h-6 rounded-full cursor-pointer transition-colors duration-200 ease-in-out bg-indigo-600 dark:bg-indigo-600;
+  }
+  
+  .toggle-slider {
+    @apply absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform;
+  }
+  
+  .toggle-active .toggle-slider {
+    @apply translate-x-6;
+  }
+}

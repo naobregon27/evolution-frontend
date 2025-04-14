@@ -181,7 +181,7 @@ export const toggleUserStatus = async (userId, isActive) => {
 // Función para cambiar la contraseña de un usuario
 export const changePassword = async (userId, oldPassword, newPassword) => {
   try {
-    const config = getAuthConfig();
+      const config = getAuthConfig();
     const response = await api.post(
       `/api/auth/change-password`, 
       {
@@ -210,6 +210,33 @@ export const getLocales = async () => {
   }
 };
 
+// Función para obtener los usuarios de un local específico
+export const getUsersByLocalId = async (localId) => {
+  try {
+    const config = getAuthConfig();
+    const response = await api.get(`/api/locales/${localId}/usuarios`, config);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al obtener usuarios del local con ID ${localId}:`, error);
+    
+    // Devolver un formato de respuesta consistente incluso en error
+    return {
+      success: false,
+      error: error.message || `Error al obtener usuarios del local con ID ${localId}`,
+      data: {
+        usuarios: [],
+        stats: {
+          total: 0,
+          activos: 0,
+          enLinea: 0,
+          admin: 0,
+          usuarios: 0
+        }
+      }
+    };
+  }
+};
+
 export default {
   getAllUsers,
   getUserById,
@@ -218,5 +245,6 @@ export default {
   deleteUser,
   toggleUserStatus,
   changePassword,
-  getLocales
+  getLocales,
+  getUsersByLocalId
 }; 

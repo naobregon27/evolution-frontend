@@ -395,9 +395,9 @@ const AsignacionLocalesPage = () => {
                               </p>
                               <div className="flex flex-wrap text-xs text-gray-500 gap-1 mt-1">
                                 <span className={`px-1.5 py-0.5 rounded ${
-                                  user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 
-                                  user.role === 'superAdmin' ? 'bg-purple-100 text-purple-800' : 
-                                  'bg-gray-100 text-gray-800'
+                                  user.role === 'admin' ? 'admin bg-blue-100 text-blue-800' : 
+                                  user.role === 'superAdmin' ? 'superadmin bg-purple-100 text-purple-800' : 
+                                  'usuario bg-gray-100 text-gray-800'
                                 }`}>
                                   {user.role || 'usuario'}
                                 </span>
@@ -477,9 +477,9 @@ const AsignacionLocalesPage = () => {
                           </p>
                           <div className="flex flex-wrap text-xs text-gray-500 gap-1 mt-1">
                             <span className={`px-1.5 py-0.5 rounded ${
-                              user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 
-                              user.role === 'superAdmin' ? 'bg-purple-100 text-purple-800' : 
-                              'bg-gray-100 text-gray-800'
+                              user.role === 'admin' ? 'admin bg-blue-100 text-blue-800' : 
+                              user.role === 'superAdmin' ? 'superadmin bg-purple-100 text-purple-800' : 
+                              'usuario bg-gray-100 text-gray-800'
                             }`}>
                               {user.role || 'usuario'}
                             </span>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleDarkMode } from '../store/reducers/settingsReducer';
 
 const Sidebar = ({ userType, userRole, isCollapsed, toggleSidebar }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const isDarkMode = useSelector(state => state.settings?.darkMode);
   
   // Usar userRole si está disponible, de lo contrario usar userType para compatibilidad
@@ -88,9 +90,10 @@ const Sidebar = ({ userType, userRole, isCollapsed, toggleSidebar }) => {
     : 'bg-gradient-to-b from-indigo-700 to-indigo-800';
 
   // Clases para botones y efectos hover
-  const toggleButtonClass = `text-indigo-300 p-1 rounded-full hover:bg-indigo-500 hover:text-white focus:outline-none ${isCollapsed ? 'w-full flex justify-center' : ''}`;
-  const menuItemActiveClass = 'bg-indigo-500 text-white font-medium';
-  const menuItemHoverClass = 'text-indigo-100 hover:bg-indigo-600 hover:text-white';
+  const toggleButtonClass = `${isDarkMode ? 'text-indigo-200' : 'text-indigo-300'} p-1 rounded-full ${isDarkMode ? 'hover:bg-indigo-700' : 'hover:bg-indigo-500'} hover:text-white focus:outline-none ${isCollapsed ? 'w-full flex justify-center' : ''}`;
+  const menuItemActiveClass = isDarkMode ? 'bg-indigo-700 text-white font-medium' : 'bg-indigo-500 text-white font-medium';
+  const menuItemHoverClass = isDarkMode ? 'text-indigo-200 hover:bg-indigo-700 hover:text-white' : 'text-indigo-100 hover:bg-indigo-600 hover:text-white';
+  const borderClass = isDarkMode ? 'border-indigo-700' : 'border-indigo-600';
 
   // Manejo del clic en el botón de toggle
   const handleToggleSidebar = (e) => {
@@ -99,13 +102,27 @@ const Sidebar = ({ userType, userRole, isCollapsed, toggleSidebar }) => {
     toggleSidebar();
   };
 
+  // Función para cambiar el modo oscuro
+  const handleToggleDarkMode = () => {
+    dispatch(toggleDarkMode());
+    
+    // Actualizar clases de HTML y guardar preferencia en localStorage
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('darkMode', 'false');
+    }
+  };
+
   return (
     <div 
       className={`${sidebarBgClass} text-white transition-all duration-300 ease-in-out h-screen ${
         isCollapsed ? 'w-20' : 'w-64'
       } fixed left-0 top-0 z-10`}
     >
-      <div className="flex items-center justify-between h-16 px-4 border-b border-indigo-600">
+      <div className={`flex items-center justify-between h-16 px-4 border-b ${borderClass}`}>
         {!isCollapsed && (
           <h1 className="text-xl font-bold">Evolution CRM</h1>
         )}
@@ -145,6 +162,73 @@ const Sidebar = ({ userType, userRole, isCollapsed, toggleSidebar }) => {
           ))}
         </ul>
       </div>
+
+      {/* Botón para cambiar el tema */}
+      {!isCollapsed ? (
+        <div className={`absolute bottom-4 left-0 right-0 px-4 py-2 border-t ${borderClass}`}>
+          <button 
+            onClick={handleToggleDarkMode}
+            className={`flex items-center w-full px-4 py-2 rounded-lg ${menuItemHoverClass}`}
+          >
+            <svg 
+              className="w-5 h-5" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {isDarkMode ? (
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              ) : (
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              )}
+            </svg>
+            <span className="ml-3">{isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
+          </button>
+        </div>
+      ) : (
+        <div className={`absolute bottom-4 left-0 right-0 flex justify-center py-2 border-t ${borderClass}`}>
+          <button 
+            onClick={handleToggleDarkMode}
+            className={`p-2 rounded-lg ${menuItemHoverClass}`}
+            title={isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
+          >
+            <svg 
+              className="w-5 h-5" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {isDarkMode ? (
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              ) : (
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              )}
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

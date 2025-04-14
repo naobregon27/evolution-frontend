@@ -59,6 +59,12 @@ html.dark {
   color: rgba(255, 255, 255, 0.87);
 }
 
+/* Estilo global para el modo oscuro */
+.dark {
+  background-color: #121212;
+  color: rgba(255, 255, 255, 0.87);
+}
+
 /* Estilo para todos los componentes en modo oscuro */
 .dark .app-container,
 .dark .card,
@@ -68,59 +74,117 @@ html.dark {
 .dark .layout,
 .dark .modal,
 .dark .dropdown,
-.dark .menu {
-  background-color: #1e1e1e;
-  color: rgba(255, 255, 255, 0.87);
-  border-color: #333;
+.dark .menu,
+.dark .page-container,
+.dark div[class*="container"],
+.dark div[class*="bg-white"],
+.dark main,
+.dark section {
+  background-color: #1e1e1e !important;
+  color: rgba(255, 255, 255, 0.87) !important;
+  border-color: #333 !important;
 }
 
-/* Estilos específicos para componentes en modo oscuro */
+/* Estilos para componentes específicos en modo oscuro */
 .dark main {
-  background-color: #1a1a1a;
+  background-color: #1a1a1a !important;
 }
 
 .dark select,
 .dark input[type="text"],
 .dark input[type="email"],
 .dark input[type="password"],
+.dark input[type="search"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark input[type="time"],
 .dark textarea {
-  background-color: #2a2a2a;
-  border-color: #444;
-  color: #e0e0e0;
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
 }
 
-.dark table {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
+/* Estilos para tablas en modo oscuro */
+.dark table,
+.dark tbody,
+.dark thead,
+.dark tr,
+.dark th,
+.dark td {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
 }
 
 .dark table th {
-  background-color: #333;
+  background-color: #333 !important;
 }
 
 .dark table tr:nth-child(even) {
-  background-color: #333;
+  background-color: #333 !important;
 }
 
 .dark table tr:hover {
-  background-color: #444;
+  background-color: #444 !important;
+}
+
+.dark table tr td {
+  color: #e0e0e0 !important;
 }
 
 /* Estilos para tarjetas en modo oscuro */
-.dark .card {
-  background-color: #2a2a2a;
-  border-color: #444;
+.dark .card,
+.dark div[class*="rounded-lg"],
+.dark div[class*="shadow-md"],
+.dark div[class*="bg-white"] {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+}
+
+/* Colores de texto en modo oscuro */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark p, .dark span, .dark div, .dark label {
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+.dark .text-gray-800, 
+.dark .text-gray-900, 
+.dark .text-black,
+.dark [class*="text-gray-"] {
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+.dark .text-gray-600, 
+.dark .text-gray-700 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark .text-gray-400, 
+.dark .text-gray-500 {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Colores de fondo específicos para Tailwind en modo oscuro */
+.dark [class*="bg-gray-50"],
+.dark [class*="bg-gray-100"],
+.dark [class*="bg-gray-200"] {
+  background-color: #2a2a2a !important;
+}
+
+/* Colores de fondo oscuros - reemplazando clases problemáticas */
+.dark-bg-override {
+  background-color: #121212 !important;
 }
 
 /* Estilos para botones en modo oscuro */
 .dark button:not(.sidebar button):not(.navbar button) {
-  background-color: #333;
-  color: white;
-  border-color: #555;
+  background-color: #333 !important;
+  color: white !important;
+  border-color: #555 !important;
 }
 
 .dark button:hover:not(.sidebar button):not(.navbar button) {
-  background-color: #444;
+  background-color: #444 !important;
 }
 
 /* Estilos para toggle switches */
@@ -170,6 +234,11 @@ html.dark {
   --color-input-border: #444;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  
+  /* Colores para sidebar y navbar en modo oscuro */
+  --sidebar-bg-from: #312e81;  /* indigo-900 */
+  --sidebar-bg-to: #3730a3;    /* indigo-800 */
+  --sidebar-text: #ffffff;
 }
 
 /* Estilos para elementos específicos en modo oscuro */
@@ -190,6 +259,20 @@ html.dark {
 
 .dark .switch-toggle {
   background-color: #4f46e5;
+}
+
+/* Estilos para modal en modo oscuro */
+.dark .modal-content,
+.dark [role="dialog"] {
+  background-color: #2a2a2a !important;
+  color: rgba(255, 255, 255, 0.87) !important;
+  border-color: #444 !important;
+}
+
+/* Estilos para dropdown/select en modo oscuro */
+.dark select option {
+  background-color: #2a2a2a !important;
+  color: rgba(255, 255, 255, 0.87) !important;
 }
 
 /* Estilos comunes */
@@ -250,6 +333,60 @@ button:focus-visible {
 }
 */
 
+/* Estilos específicos para componentes en el modo oscuro */
+.dark .min-h-screen,
+.dark .container {
+  background-color: #121212 !important;
+}
+
+/* Estilos específicos para la vista de locales */
+.dark .divide-y,
+.dark .divide-gray-200,
+.dark .divide-gray-700 {
+  border-color: #444 !important;
+}
+
+/* Estilos específicos para la vista de usuarios */
+.dark .overflow-x-auto {
+  background-color: transparent !important;
+}
+
+.dark .bg-indigo-50 {
+  background-color: rgba(79, 70, 229, 0.2) !important;
+}
+
+.dark .text-indigo-600,
+.dark .text-indigo-700 {
+  color: #818cf8 !important;
+}
+
+/* Botón primario */
+.dark .bg-indigo-600 {
+  background-color: #4f46e5 !important;
+}
+
+.dark .bg-indigo-600:hover {
+  background-color: #4338ca !important;
+}
+
+/* Botones de estado */
+.dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.dark .text-red-800 {
+  color: #f87171 !important;
+}
+
+/* Estilos para sidebar y navbar en modo oscuro */
+.dark .sidebar {
+  background-image: linear-gradient(to bottom, var(--sidebar-bg-from), var(--sidebar-bg-to));
+}
+
+.dark .navbar {
+  background-image: linear-gradient(to right, var(--sidebar-bg-from), var(--sidebar-bg-to));
+}
+
 /* Estilos personalizados adicionales */
 @layer components {
   .counter {
@@ -257,7 +394,7 @@ button:focus-visible {
   }
   
   .card {
-    @apply p-4 rounded-xl border border-gray-300 dark:border-gray-700 transition-colors duration-300;
+    @apply p-4 rounded-xl border border-gray-300 transition-colors duration-300;
   }
   
   .logo {
@@ -273,12 +410,12 @@ button:focus-visible {
   }
   
   .read-the-docs {
-    @apply text-gray-500 dark:text-gray-400;
+    @apply text-gray-500;
   }
   
   /* Componentes personalizados para la configuración */
   .settings-section {
-    @apply p-4 border-b border-gray-200 dark:border-gray-700;
+    @apply p-4 border-b border-gray-200;
   }
   
   .settings-option {
@@ -286,7 +423,7 @@ button:focus-visible {
   }
   
   .toggle-switch {
-    @apply relative inline-block w-12 h-6 rounded-full cursor-pointer transition-colors duration-200 ease-in-out bg-indigo-600 dark:bg-indigo-600;
+    @apply relative inline-block w-12 h-6 rounded-full cursor-pointer transition-colors duration-200 ease-in-out bg-indigo-600;
   }
   
   .toggle-slider {
@@ -296,4 +433,347 @@ button:focus-visible {
   .toggle-active .toggle-slider {
     @apply translate-x-6;
   }
+}
+
+/* Estilos específicos para la vista de asignación locales */
+.dark .asignacion-locales {
+  background-color: #1a1a1a !important;
+}
+
+/* Estilos para los elementos de usuario y estado en asignación locales */
+.dark .usuario, 
+.dark [class*="usuario-"] {
+  background-color: #2a2a2a !important;
+  color: white !important;
+  border-color: #444 !important;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.dark .estado-activo,
+.dark [class*="estado-activo"] {
+  background-color: rgba(74, 222, 128, 0.2) !important;
+  color: #4ade80 !important;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.dark .estado-inactivo,
+.dark [class*="estado-inactivo"] {
+  background-color: rgba(248, 113, 113, 0.2) !important;
+  color: #f87171 !important;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.dark .admin,
+.dark [class*="admin"] {
+  background-color: rgba(79, 70, 229, 0.2) !important;
+  color: #818cf8 !important;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Mejora para los elementos de la tabla de locales */
+.dark .locales-list,
+.dark .usuarios-list {
+  background-color: #1e1e1e !important;
+  border-color: #333 !important;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.dark .locales-list h3,
+.dark .usuarios-list h3 {
+  background-color: #2a2a2a !important;
+  color: white !important;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  border-bottom: 1px solid #444;
+}
+
+.dark .local-item,
+.dark .usuario-item {
+  border-bottom: 1px solid #333 !important;
+  padding: 0.75rem 1rem;
+}
+
+.dark .local-item:hover,
+.dark .usuario-item:hover {
+  background-color: #2a2a2a !important;
+}
+
+/* Etiquetas y badges específicos */
+.dark .badge,
+.dark [class*="badge-"] {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.dark .badge-yellow {
+  background-color: rgba(234, 179, 8, 0.2) !important;
+  color: #facc15 !important;
+}
+
+/* Corregir contrastes en textos e inputs */
+.dark input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Asegurar que los botones tengan buen contraste */
+.dark .btn-primary,
+.dark [class*="btn-primary"] {
+  background-color: #4f46e5 !important;
+  color: white !important;
+}
+
+.dark .btn-secondary,
+.dark [class*="btn-secondary"] {
+  background-color: #4b5563 !important;
+  color: white !important;
+}
+
+.dark .btn-danger,
+.dark [class*="btn-danger"] {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+/* Estilos mejorados para botones de estado y etiquetas en asignación locales */
+.dark [class*="bg-green-100"] {
+  background-color: rgba(74, 222, 128, 0.2) !important;
+  color: #4ade80 !important;
+}
+
+.dark [class*="bg-red-100"] {
+  background-color: rgba(248, 113, 113, 0.2) !important;
+  color: #f87171 !important;
+}
+
+.dark [class*="bg-yellow-100"] {
+  background-color: rgba(234, 179, 8, 0.2) !important;
+  color: #facc15 !important;
+}
+
+.dark [class*="bg-indigo-100"] {
+  background-color: rgba(79, 70, 229, 0.2) !important;
+  color: #818cf8 !important;
+}
+
+.dark [class*="bg-gray-100"] {
+  background-color: rgba(209, 213, 219, 0.2) !important;
+  color: #e5e7eb !important;
+}
+
+.dark [class*="bg-gray-50"] {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0 !important;
+}
+
+.dark [class*="text-gray-600"],
+.dark [class*="text-gray-800"] {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark [class*="text-indigo-800"] {
+  color: #818cf8 !important;
+}
+
+.dark [class*="text-green-800"] {
+  color: #4ade80 !important;
+}
+
+.dark [class*="text-red-800"] {
+  color: #f87171 !important;
+}
+
+.dark [class*="text-yellow-800"] {
+  color: #facc15 !important;
+}
+
+/* Estilos específicos para los elementos en dark mode */
+.dark .estado-activo {
+  background-color: rgba(74, 222, 128, 0.2) !important;
+  color: #4ade80 !important;
+}
+
+.dark .estado-inactivo {
+  background-color: rgba(248, 113, 113, 0.2) !important;
+  color: #f87171 !important;
+}
+
+.dark .usuario {
+  background-color: rgba(209, 213, 219, 0.2) !important;
+  color: #e5e7eb !important;
+}
+
+.dark .admin {
+  background-color: rgba(79, 70, 229, 0.2) !important;
+  color: #818cf8 !important;
+}
+
+/* Mejorar estilos de fondos de paneles y tarjetas */
+.dark .bg-white {
+  background-color: #1e1e1e !important;
+}
+
+.dark .divide-gray-200 > * {
+  border-color: #333 !important;
+}
+
+/* Estilos para las advertencias en modo oscuro */
+.dark .bg-yellow-50,
+.dark [class*="bg-yellow-50"] {
+  background-color: rgba(234, 179, 8, 0.1) !important;
+  border-color: #facc15 !important;
+}
+
+.dark .text-yellow-700,
+.dark [class*="text-yellow-700"] {
+  color: #fde047 !important;
+}
+
+/* Estilos para los badges de roles admin y superAdmin */
+.dark .bg-blue-100,
+.dark [class*="bg-blue-100"] {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  color: #93c5fd !important;
+}
+
+.dark .text-blue-800,
+.dark [class*="text-blue-800"] {
+  color: #93c5fd !important;
+}
+
+.dark .bg-purple-100,
+.dark [class*="bg-purple-100"] {
+  background-color: rgba(147, 51, 234, 0.2) !important;
+  color: #d8b4fe !important;
+}
+
+.dark .text-purple-800,
+.dark [class*="text-purple-800"] {
+  color: #d8b4fe !important;
+}
+
+/* Estilos para los badges de estado */
+.dark .bg-green-50,
+.dark [class*="bg-green-50"] {
+  background-color: rgba(74, 222, 128, 0.1) !important;
+  color: #4ade80 !important;
+}
+
+.dark .text-green-700,
+.dark [class*="text-green-700"] {
+  color: #4ade80 !important;
+}
+
+/* Estilos para el box de advertencia */
+.dark .bg-white {
+  background-color: #1e1e1e !important;
+}
+
+/* Estilos para los textos de resumen en modo oscuro */
+.dark .bg-gray-100,
+.dark [class*="bg-gray-100"] {
+  background-color: #2a2a2a !important;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Estilos para el panel de SuperAdmin en modo oscuro */
+.dark .dashboard-card,
+.dark [class*="dashboard-card"],
+.dark [class*="bg-gray-200"],
+.dark [class*="bg-gray-300"] {
+  background-color: #2a2a2a !important;
+  color: rgba(255, 255, 255, 0.87) !important;
+  border-color: #444 !important;
+}
+
+/* Estilos para los iconos del panel de SuperAdmin */
+.dark .config-icon,
+.dark [class*="config-icon"] {
+  background-color: rgba(79, 70, 229, 0.2) !important;
+}
+
+/* Estilos para las tarjetas de acciones rápidas */
+.dark .action-card,
+.dark [class*="action-card"] {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .action-card:hover,
+.dark [class*="action-card"]:hover {
+  background-color: #333 !important;
+  border-color: #555 !important;
+}
+
+/* Estilos para los iconos en modo oscuro */
+.dark .icon-container,
+.dark [class*="icon-container"] {
+  background-color: rgba(79, 70, 229, 0.2) !important;
+}
+
+/* Estilos para las estadísticas */
+.dark .stats-card {
+  background-color: #2a2a2a !important;
+  color: white !important;
+  border-color: #444 !important;
+}
+
+.dark .stats-value {
+  color: white !important;
+  font-weight: bold;
+}
+
+/* Botón de cambio de contraseña */
+.dark .btn-password {
+  background-color: #4b5563 !important;
+  color: white !important;
+}
+
+.dark .btn-password:hover {
+  background-color: #374151 !important;
+}
+
+/* Avatar y elementos de perfil */
+.dark .avatar-container,
+.dark [class*="rounded-full"] {
+  border-color: #444 !important;
+}
+
+/* Iconos específicos */
+.dark .config-icon svg,
+.dark .user-icon svg,
+.dark .settings-icon svg {
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+/* Estilos para los elementos con color ámbar en modo oscuro */
+.dark .bg-amber-100,
+.dark [class*="bg-amber-100"] {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+.dark .text-amber-600,
+.dark [class*="text-amber-600"] {
+  color: #fbbf24 !important;
+}
+
+.dark .bg-green-100,
+.dark [class*="bg-green-100"] {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.dark .text-green-600,
+.dark [class*="text-green-600"] {
+  color: #34d399 !important;
 }

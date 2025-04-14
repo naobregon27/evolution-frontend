@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { FaSearch, FaFilter } from 'react-icons/fa';
 
 // Importar componentes
 import UserTable from '../components/UserTable';
@@ -36,11 +37,26 @@ const UsersManagement = () => {
   const [userToToggle, setUserToToggle] = useState(null);
   const [showConfirmToggle, setShowConfirmToggle] = useState(false);
 
+  // Estados para el buscador/filtro
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchField, setSearchField] = useState('nombre');
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    role: '',
+    local: '',
+    estado: ''
+  });
+  
   // Estado para el token
   const [storedToken, setStoredToken] = useState(localStorage.getItem('token'));
   
   // Estado para indicar si estamos usando datos del cache
   const [usingCachedData, setUsingCachedData] = useState(false);
+  
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(15);
 
   // Actualizar el token almacenado cuando cambie
   useEffect(() => {
@@ -280,6 +296,90 @@ const UsersManagement = () => {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Efecto para filtrar usuarios según los criterios de búsqueda
+  useEffect(() => {
+    if (!users || users.length === 0) {
+      setFilteredUsers([]);
+      return;
+    }
+
+    let filtered = [...users];
+
+    // Aplicar búsqueda por texto
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(user => {
+        if (searchField === 'nombre') {
+          return (user.nombre || user.name || user.username || '').toLowerCase().includes(term);
+        } else if (searchField === 'email') {
+          return (user.email || '').toLowerCase().includes(term);
+        } else if (searchField === 'role') {
+          const userRole = (user.role || '').toLowerCase();
+          return userRole.includes(term);
+        } else if (searchField === 'local') {
+          return (
+            (user.local?.nombre || '') +
+            (user.locales?.map(l => l.nombre).join(' ') || '')
+          ).toLowerCase().includes(term);
+        }
+        return false;
+      });
+    }
+
+    // Aplicar filtros adicionales
+    if (filters.role) {
+      filtered = filtered.filter(user => 
+        (user.role || '').toLowerCase() === filters.role.toLowerCase()
+      );
+    }
+
+    if (filters.local) {
+      filtered = filtered.filter(user => 
+        (user.local?.nombre || '').toLowerCase().includes(filters.local.toLowerCase()) ||
+        (user.locales || []).some(local => 
+          (local.nombre || '').toLowerCase().includes(filters.local.toLowerCase())
+        )
+      );
+    }
+
+    if (filters.estado) {
+      const isActive = filters.estado === 'activo';
+      filtered = filtered.filter(user => {
+        const userActive = user.activo || user.active || user.isActive || false;
+        return userActive === isActive;
+      });
+    }
+
+    setFilteredUsers(filtered);
+    setCurrentPage(1); // Reset a la primera página cuando cambian los filtros
+  }, [users, searchTerm, searchField, filters]);
+
+  // Calcular usuarios para la página actual
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const usersToDisplay = searchTerm || filters.role || filters.local || filters.estado
+    ? filteredUsers
+    : users;
+  const currentUsers = usersToDisplay.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(usersToDisplay.length / usersPerPage);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Navegar a la página siguiente
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Navegar a la página anterior
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -601,6 +701,116 @@ const UsersManagement = () => {
             {error}
           </div>
         )}
+
+        {/* Buscador y filtros */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex flex-col md:flex-row gap-3 mb-3">
+            <div className="flex-1">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Buscar usuarios..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <div className="md:w-48">
+              <select
+                value={searchField}
+                onChange={(e) => setSearchField(e.target.value)}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="nombre">Buscar por Nombre</option>
+                <option value="email">Buscar por Email</option>
+                <option value="role">Buscar por Rol</option>
+                <option value="local">Buscar por Local</option>
+              </select>
+            </div>
+            <div className="flex-shrink-0">
+              <button 
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <FaFilter className="mr-2 text-gray-500" />
+                <span>Filtros</span>
+                {(filters.role || filters.local || filters.estado) && (
+                  <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-indigo-600 rounded-full">
+                    {[filters.role, filters.local, filters.estado].filter(Boolean).length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Filtros adicionales */}
+          {showFilters && (
+            <div className="mt-3 p-4 bg-white border border-gray-200 rounded-md">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+                  <select
+                    value={filters.role}
+                    onChange={(e) => setFilters({...filters, role: e.target.value})}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  >
+                    <option value="">Todos los roles</option>
+                    <option value="superAdmin">Super Admin</option>
+                    <option value="admin">Admin</option>
+                    <option value="usuario">Usuario</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Local</label>
+                  <input
+                    type="text"
+                    placeholder="Nombre del local"
+                    value={filters.local}
+                    onChange={(e) => setFilters({...filters, local: e.target.value})}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                  <select
+                    value={filters.estado}
+                    onChange={(e) => setFilters({...filters, estado: e.target.value})}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  >
+                    <option value="">Todos</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
+                </div>
+              </div>
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={() => {
+                    setFilters({ role: '', local: '', estado: '' });
+                    setSearchTerm('');
+                  }}
+                  className="ml-3 px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none"
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Resultados de la búsqueda */}
+          {searchTerm || filters.role || filters.local || filters.estado ? (
+            <div className="mt-2 text-sm text-gray-600">
+              {filteredUsers.length === 0 ? 
+                'No se encontraron resultados' : 
+                `Mostrando ${filteredUsers.length} de ${users.length} usuarios`}
+            </div>
+          ) : null}
+        </div>
         
         {isLoading && !showUserModal && !showConfirmDelete && !showConfirmToggle ? (
           <div className="text-center py-8 sm:py-10">
@@ -631,11 +841,133 @@ const UsersManagement = () => {
             ) : (
               <div className="overflow-x-auto -mx-3 sm:-mx-0">
                 <UserTable
-                  users={users}
+                  users={currentUsers}
                   onEdit={handleEditUser}
                   onDelete={handleDeleteUser}
                   onToggleStatus={handleToggleUserStatus}
                 />
+                
+                {/* Paginación */}
+                {usersToDisplay.length > usersPerPage && (
+                  <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div className="flex-1 flex justify-between sm:hidden">
+                      <button
+                        onClick={prevPage}
+                        disabled={currentPage === 1}
+                        className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                          currentPage === 1
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        Anterior
+                      </button>
+                      <span className="text-sm text-gray-700">
+                        Página {currentPage} de {totalPages}
+                      </span>
+                      <button
+                        onClick={nextPage}
+                        disabled={currentPage === totalPages}
+                        className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                          currentPage === totalPages
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm text-gray-700">
+                          Mostrando <span className="font-medium">{indexOfFirstUser + 1}</span> a{' '}
+                          <span className="font-medium">
+                            {indexOfLastUser > usersToDisplay.length ? usersToDisplay.length : indexOfLastUser}
+                          </span>{' '}
+                          de <span className="font-medium">{usersToDisplay.length}</span> usuarios
+                        </p>
+                      </div>
+                      <div>
+                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                          <button
+                            onClick={prevPage}
+                            disabled={currentPage === 1}
+                            className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                              currentPage === 1
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-500 hover:bg-gray-50'
+                            }`}
+                          >
+                            <span className="sr-only">Anterior</span>
+                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                          
+                          {/* Botones de paginación */}
+                          {Array.from({ length: totalPages }, (_, i) => {
+                            // Mostrar siempre la primera y última página
+                            // Mostrar 5 páginas alrededor de la página actual
+                            const pageNumber = i + 1;
+                            const isFirstPage = pageNumber === 1;
+                            const isLastPage = pageNumber === totalPages;
+                            const isCurrentPage = pageNumber === currentPage;
+                            const isClosePage = 
+                              pageNumber >= currentPage - 2 && 
+                              pageNumber <= currentPage + 2;
+                              
+                            if (isFirstPage || isLastPage || isCurrentPage || isClosePage || totalPages <= 7) {
+                              return (
+                                <button
+                                  key={i}
+                                  onClick={() => paginate(pageNumber)}
+                                  className={`relative inline-flex items-center px-4 py-2 border ${
+                                    isCurrentPage
+                                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                  } text-sm font-medium`}
+                                >
+                                  {pageNumber}
+                                </button>
+                              );
+                            } 
+                            // Mostrar puntos suspensivos
+                            else if (
+                              (i === 1 && currentPage > 3) || 
+                              (i === totalPages - 2 && currentPage < totalPages - 2)
+                            ) {
+                              return (
+                                <span
+                                  key={i}
+                                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                                >
+                                  ...
+                                </span>
+                              );
+                            }
+                            
+                            return null;
+                          })}
+                          
+                          <button
+                            onClick={nextPage}
+                            disabled={currentPage === totalPages}
+                            className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                              currentPage === totalPages
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-500 hover:bg-gray-50'
+                            }`}
+                          >
+                            <span className="sr-only">Siguiente</span>
+                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        </nav>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </>

@@ -12,12 +12,14 @@ import {
 } from '../store/reducers/localesReducer';
 import LocalForm from '../components/locales/LocalForm';
 import LocalDetails from '../components/locales/LocalDetails';
+import LocalUsersModal from '../components/locales/LocalUsersModal';
 import { toast } from 'react-toastify';
-import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaEye, FaSearch, FaUsers } from 'react-icons/fa';
 import { PlusIcon, ExclamationIcon } from '@heroicons/react/outline';
 import Modal from '../components/common/Modal';
 import Alert from '../components/common/Alert';
 import LocalesList from '../components/locales/LocalesList';
+import { getUsersByLocalId } from '../services/userService';
 
 // Datos de prueba para mostrar mientras se soluciona el problema con la API
 const MOCK_LOCALES = [
@@ -73,6 +75,21 @@ const LocalesPage = () => {
   const [alert, setAlert] = useState({ show: false, type: '', message: '' });
   const [useMockData, setUseMockData] = useState(false);
   const [mockLocales, setMockLocales] = useState(MOCK_LOCALES);
+  
+  // Estados para el buscador
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchField, setSearchField] = useState('nombre');
+  const [filteredLocales, setFilteredLocales] = useState([]);
+  
+  // Estados para el modal de usuarios
+  const [showUsersModal, setShowUsersModal] = useState(false);
+  const [selectedLocalForUsers, setSelectedLocalForUsers] = useState(null);
+  const [localUsersData, setLocalUsersData] = useState({ usuarios: [], stats: {} });
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [localesPerPage] = useState(10);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,6 +121,59 @@ const LocalesPage = () => {
     useMockData ? mockLocales : locales, 
     [useMockData, mockLocales, locales]
   );
+  
+  // Efecto para filtrar los locales basados en el término de búsqueda
+  useEffect(() => {
+    if (!displayedLocales) {
+      setFilteredLocales([]);
+      return;
+    }
+    
+    if (!searchTerm.trim()) {
+      setFilteredLocales(displayedLocales);
+      return;
+    }
+    
+    const lowerSearchTerm = searchTerm.toLowerCase().trim();
+    
+    const filtered = displayedLocales.filter(local => {
+      if (searchField === 'nombre' && local.nombre) {
+        return local.nombre.toLowerCase().includes(lowerSearchTerm);
+      } else if (searchField === 'direccion' && local.direccion) {
+        return local.direccion.toLowerCase().includes(lowerSearchTerm);
+      } else if (searchField === 'estado') {
+        const estadoText = local.activo ? 'activo' : 'inactivo';
+        return estadoText.includes(lowerSearchTerm);
+      }
+      return false;
+    });
+    
+    setFilteredLocales(filtered);
+    setCurrentPage(1); // Reset a la primera página cuando cambian los filtros
+  }, [displayedLocales, searchTerm, searchField]);
+
+  // Calcular locales para la página actual
+  const indexOfLastLocal = currentPage * localesPerPage;
+  const indexOfFirstLocal = indexOfLastLocal - localesPerPage;
+  const localesForCurrentPage = filteredLocales?.slice(indexOfFirstLocal, indexOfLastLocal) || [];
+  const totalPages = Math.ceil((filteredLocales?.length || 0) / localesPerPage);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Navegar a la página siguiente
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Navegar a la página anterior
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   const handleAddLocal = () => {
     setIsEditing(false);
@@ -167,6 +237,7 @@ const LocalesPage = () => {
 
   const handleCloseDetails = () => {
     setShowDetails(false);
+    setViewMode('list');
   };
 
   const handleFormSubmit = (formData) => {
@@ -270,6 +341,50 @@ const LocalesPage = () => {
     }
   };
 
+  // Función para cargar usuarios de un local y mostrar el modal
+  const handleShowUsersModal = (local) => {
+    // Primero, resetear los datos de usuarios para evitar mostrar información del local anterior
+    setLocalUsersData({ usuarios: [], stats: {} });
+    // Luego, establecer el local seleccionado y mostrar el modal inmediatamente
+    setSelectedLocalForUsers(local);
+    setShowUsersModal(true);
+    // Finalmente, cargar los datos
+    loadLocalUsers(local._id);
+  };
+  
+  // Función para cerrar modal de usuarios
+  const handleCloseUsersModal = () => {
+    setShowUsersModal(false);
+    setSelectedLocalForUsers(null);
+  };
+
+  // Función para cargar usuarios de un local
+  const loadLocalUsers = async (localId) => {
+    if (!localId) return;
+    
+    setLoadingUsers(true);
+    try {
+      console.log(`Cargando usuarios del local ${localId}...`);
+      const response = await getUsersByLocalId(localId);
+      
+      if (response && response.success && response.data) {
+        console.log('Usuarios obtenidos:', response.data);
+        setLocalUsersData({
+          usuarios: response.data.usuarios || [],
+          stats: response.data.stats || {}
+        });
+      } else {
+        console.error('Error al obtener usuarios del local:', response);
+        setLocalUsersData({ usuarios: [], stats: {} });
+      }
+    } catch (error) {
+      console.error('Error al cargar usuarios del local:', error);
+      setLocalUsersData({ usuarios: [], stats: {} });
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   // Mostrar mensaje de depuración para confirmar datos
   console.log('Datos actuales de locales:', 
     useMockData ? 'Mock data' : 'Datos de API', 
@@ -298,6 +413,45 @@ const LocalesPage = () => {
               </button>
             </div>
             
+            {/* Buscador de locales */}
+            <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
+              <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex-1">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FaSearch className="text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Buscar locales..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="md:w-48">
+                  <select
+                    value={searchField}
+                    onChange={(e) => setSearchField(e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  >
+                    <option value="nombre">Buscar por Nombre</option>
+                    <option value="direccion">Buscar por Dirección</option>
+                    <option value="estado">Buscar por Estado</option>
+                  </select>
+                </div>
+              </div>
+              
+              {searchTerm && (
+                <div className="mt-2 text-sm text-gray-600">
+                  {filteredLocales.length === 0 ? 
+                    'No se encontraron resultados' : 
+                    `Mostrando ${filteredLocales.length} de ${displayedLocales?.length || 0} locales`}
+                </div>
+              )}
+            </div>
+            
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="overflow-x-auto">
                 <table className={`min-w-full divide-y divide-gray-200 ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'}`}>
@@ -321,9 +475,13 @@ const LocalesPage = () => {
                     </tr>
                   </thead>
                   <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
-                    {displayedLocales?.length > 0 ? (
-                      displayedLocales.map((local) => (
-                        <tr key={local._id} className={isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                    {localesForCurrentPage?.length > 0 ? (
+                      localesForCurrentPage.map((local) => (
+                        <tr 
+                          key={local._id} 
+                          className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} cursor-pointer`}
+                          onClick={() => handleShowUsersModal(local)}
+                        >
                           <td className="px-6 py-4 whitespace-nowrap">
                             {local.nombre}
                           </td>
@@ -344,21 +502,40 @@ const LocalesPage = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button
-                              onClick={() => handleViewDetails(local._id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleShowUsersModal(local);
+                              }}
+                              className="text-purple-600 hover:text-purple-900 mx-1"
+                              title="Ver usuarios"
+                            >
+                              <FaUsers />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewDetails(local._id);
+                              }}
                               className="text-indigo-600 hover:text-indigo-900 mx-1"
                               title="Ver detalles"
                             >
                               <FaEye />
                             </button>
                             <button
-                              onClick={() => handleEditLocal(local._id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditLocal(local._id);
+                              }}
                               className="text-blue-600 hover:text-blue-900 mx-1"
                               title="Editar"
                             >
                               <FaEdit />
                             </button>
                             <button
-                              onClick={() => handleDeleteConfirm(local)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteConfirm(local);
+                              }}
                               className="text-red-600 hover:text-red-900 mx-1"
                               title="Eliminar"
                             >
@@ -377,6 +554,128 @@ const LocalesPage = () => {
                   </tbody>
                 </table>
               </div>
+              
+              {/* Paginación */}
+              {filteredLocales?.length > localesPerPage && (
+                <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={prevPage}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === 1
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Anterior
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Página {currentPage} de {totalPages}
+                    </span>
+                    <button
+                      onClick={nextPage}
+                      disabled={currentPage === totalPages}
+                      className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === totalPages
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Mostrando <span className="font-medium">{indexOfFirstLocal + 1}</span> a{' '}
+                        <span className="font-medium">
+                          {indexOfLastLocal > filteredLocales.length ? filteredLocales.length : indexOfLastLocal}
+                        </span>{' '}
+                        de <span className="font-medium">{filteredLocales.length}</span> locales
+                      </p>
+                    </div>
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <button
+                          onClick={prevPage}
+                          disabled={currentPage === 1}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                            currentPage === 1
+                              ? 'text-gray-300 cursor-not-allowed'
+                              : 'text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span className="sr-only">Anterior</span>
+                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                        
+                        {/* Botones de paginación */}
+                        {Array.from({ length: totalPages }, (_, i) => {
+                          // Mostrar siempre la primera y última página
+                          // Mostrar 5 páginas alrededor de la página actual
+                          const pageNumber = i + 1;
+                          const isFirstPage = pageNumber === 1;
+                          const isLastPage = pageNumber === totalPages;
+                          const isCurrentPage = pageNumber === currentPage;
+                          const isClosePage = 
+                            pageNumber >= currentPage - 2 && 
+                            pageNumber <= currentPage + 2;
+                            
+                          if (isFirstPage || isLastPage || isCurrentPage || isClosePage || totalPages <= 7) {
+                            return (
+                              <button
+                                key={i}
+                                onClick={() => paginate(pageNumber)}
+                                className={`relative inline-flex items-center px-4 py-2 border ${
+                                  isCurrentPage
+                                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                } text-sm font-medium`}
+                              >
+                                {pageNumber}
+                              </button>
+                            );
+                          } 
+                          // Mostrar puntos suspensivos
+                          else if (
+                            (i === 1 && currentPage > 3) || 
+                            (i === totalPages - 2 && currentPage < totalPages - 2)
+                          ) {
+                            return (
+                              <span
+                                key={i}
+                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                              >
+                                ...
+                              </span>
+                            );
+                          }
+                          
+                          return null;
+                        })}
+                        
+                        <button
+                          onClick={nextPage}
+                          disabled={currentPage === totalPages}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                            currentPage === totalPages
+                              ? 'text-gray-300 cursor-not-allowed'
+                              : 'text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span className="sr-only">Siguiente</span>
+                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </nav>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -396,7 +695,7 @@ const LocalesPage = () => {
                   Editar
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={handleCloseDetails}
                   className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} font-medium py-2 px-4 rounded-md inline-flex`}
                 >
                   Volver
@@ -435,6 +734,16 @@ const LocalesPage = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de usuarios del local */}
+      <LocalUsersModal
+        isOpen={showUsersModal}
+        onClose={handleCloseUsersModal}
+        localData={selectedLocalForUsers}
+        usuarios={localUsersData.usuarios}
+        stats={localUsersData.stats}
+        loading={loadingUsers}
+      />
 
       {/* Modal de confirmación de eliminación */}
       <Modal

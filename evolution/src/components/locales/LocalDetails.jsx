@@ -11,7 +11,7 @@ const LocalDetails = ({ local, onEdit, onClose }) => {
 
   const formatHorario = () => {
     const { apertura, cierre, diasOperacion } = local.horario || { apertura: '', cierre: '', diasOperacion: [] };
-    return `${apertura} - ${cierre}, ${diasOperacion.join(', ')}`;
+    return `${apertura} - ${cierre}, ${diasOperacion ? diasOperacion.join(', ') : ''}`;
   };
 
   return (
@@ -38,7 +38,7 @@ const LocalDetails = ({ local, onEdit, onClose }) => {
           <div className="space-y-3">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Dirección</p>
-              <p className="font-medium">{local.direccion}</p>
+              <p className="font-medium">{local.direccion || 'No disponible'}</p>
             </div>
             
             <div>
@@ -57,36 +57,40 @@ const LocalDetails = ({ local, onEdit, onClose }) => {
           <h3 className="text-lg font-semibold mb-4">Horario</h3>
           
           <div className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Horario de atención</p>
-              <p className="font-medium">{formatHorario()}</p>
-            </div>
-            
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Días de operación</p>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {local.horario?.diasOperacion.map(dia => (
-                  <span 
-                    key={dia}
-                    className="px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 rounded-md text-sm"
-                  >
-                    {dia}
-                  </span>
-                ))}
-              </div>
-            </div>
+            {local.horario ? (
+              <>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Horario de atención</p>
+                  <p className="font-medium">{formatHorario()}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Días de operación</p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {local.horario?.diasOperacion?.map(dia => (
+                      <span 
+                        key={dia}
+                        className="px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 rounded-md text-sm"
+                      >
+                        {dia}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-gray-500 italic">No hay información de horario disponible</p>
+            )}
           </div>
         </div>
       </div>
       
-      {local.descripcion && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Descripción</h3>
-          <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-            {local.descripcion}
-          </p>
-        </div>
-      )}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">Descripción</h3>
+        <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          {local.descripcion || 'No hay descripción disponible para este local.'}
+        </p>
+      </div>
 
       <div className="flex justify-end space-x-4">
         <button
@@ -100,7 +104,7 @@ const LocalDetails = ({ local, onEdit, onClose }) => {
           Cerrar
         </button>
         <button
-          onClick={() => onEdit(local)}
+          onClick={() => onEdit(local._id)}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
         >
           Editar

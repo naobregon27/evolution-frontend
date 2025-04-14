@@ -187,6 +187,19 @@ const AsignacionLocalesPage = () => {
     } else {
       // Si no está seleccionado, lo agregamos (solo un usuario a la vez)
       setSelectedUsers([user]);
+      
+      // Mostrar advertencia si el usuario ya tiene locales asignados
+      if ((user.locales && user.locales.length > 0) || user.local) {
+        // Determinar el mensaje según si tiene uno o varios locales
+        const localInfo = user.locales && user.locales.length > 0 
+          ? `${user.locales.length} ${user.locales.length === 1 ? 'local' : 'locales'}`
+          : user.local?.nombre || 'un local';
+        
+        toast.warning(
+          `¡Atención! Este usuario ya tiene ${localInfo} asignado. Si continúa, se cambiará su asignación al local seleccionado.`,
+          { autoClose: 6000 }  // Mantener la notificación visible por más tiempo
+        );
+      }
     }
   };
 
@@ -380,7 +393,7 @@ const AsignacionLocalesPage = () => {
                               <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 {user.nombre || user.email}
                               </p>
-                              <div className="flex flex-wrap text-xs text-gray-500 gap-1">
+                              <div className="flex flex-wrap text-xs text-gray-500 gap-1 mt-1">
                                 <span className={`px-1.5 py-0.5 rounded ${
                                   user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 
                                   user.role === 'superAdmin' ? 'bg-purple-100 text-purple-800' : 
@@ -393,12 +406,32 @@ const AsignacionLocalesPage = () => {
                                 }`}>
                                   {user.activo === true ? 'Activo' : 'Inactivo'}
                                 </span>
-                                {user.local && (
-                                  <span className="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800">
-                                    {user.local.nombre || 'Con local'}
-                                  </span>
-                                )}
                               </div>
+                              
+                              {/* Locales asignados al usuario */}
+                              {user.locales && user.locales.length > 0 ? (
+                                <div className="mt-1">
+                                  <p className="text-xs text-gray-600 mb-1">Locales asignados:</p>
+                                  <div className="flex flex-wrap gap-1">
+                                    {user.locales.map(local => (
+                                      <span key={local._id || local.id} className="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs flex items-center">
+                                        <FaBuilding className="h-3 w-3 mr-1" /> 
+                                        {local.nombre || 'Local sin nombre'}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : user.local ? (
+                                <div className="mt-1">
+                                  <p className="text-xs text-gray-600 mb-1">Local asignado:</p>
+                                  <span className="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs flex items-center">
+                                    <FaBuilding className="h-3 w-3 mr-1" /> 
+                                    {user.local.nombre || 'Local sin nombre'}
+                                  </span>
+                                </div>
+                              ) : (
+                                <p className="text-xs text-gray-500 mt-1 italic">Sin locales asignados</p>
+                                )}
                             </div>
                             
                             {/* NUESTRA PROPIA MARCA VISUAL EXPLÍCITA DE SELECCIÓN */}
@@ -439,7 +472,9 @@ const AsignacionLocalesPage = () => {
                       <div key={user.id || user._id} className="flex items-center">
                         <FaUser className="text-indigo-600 mr-2" />
                         <div>
-                          <p className="font-medium">{user.nombre || user.email}</p>
+                          <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            {user.nombre || user.email}
+                          </p>
                           <div className="flex flex-wrap text-xs text-gray-500 gap-1 mt-1">
                             <span className={`px-1.5 py-0.5 rounded ${
                               user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 
@@ -448,12 +483,37 @@ const AsignacionLocalesPage = () => {
                             }`}>
                               {user.role || 'usuario'}
                             </span>
-                            {user.local && (
-                              <span className="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800">
-                                {user.local.nombre || 'Con local'}
-                              </span>
-                            )}
+                            <span className={`px-1.5 py-0.5 rounded ${
+                              user.activo === true ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                              {user.activo === true ? 'Activo' : 'Inactivo'}
+                            </span>
                           </div>
+                          
+                          {/* Locales asignados al usuario */}
+                          {user.locales && user.locales.length > 0 ? (
+                            <div className="mt-1">
+                              <p className="text-xs text-gray-600 mb-1">Locales asignados:</p>
+                              <div className="flex flex-wrap gap-1">
+                                {user.locales.map(local => (
+                                  <span key={local._id || local.id} className="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs flex items-center">
+                                    <FaBuilding className="h-3 w-3 mr-1" /> 
+                                    {local.nombre || 'Local sin nombre'}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ) : user.local ? (
+                            <div className="mt-1">
+                              <p className="text-xs text-gray-600 mb-1">Local asignado:</p>
+                              <span className="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs flex items-center">
+                                <FaBuilding className="h-3 w-3 mr-1" /> 
+                                {user.local.nombre || 'Local sin nombre'}
+                              </span>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-gray-500 mt-1 italic">Sin locales asignados</p>
+                            )}
                         </div>
                       </div>
                     ))}
@@ -463,7 +523,11 @@ const AsignacionLocalesPage = () => {
                 )}
               </div>
               
-              {selectedUsers.length > 0 && selectedUsers[0].local && selectedUsers[0].local.nombre && (
+              {/* Advertencia sobre locales existentes */}
+              {selectedUsers.length > 0 && (
+                (selectedUsers[0].locales && selectedUsers[0].locales.length > 0) || 
+                (selectedUsers[0].local && selectedUsers[0].local.nombre)
+              ) && (
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
                   <div className="flex">
                     <div className="flex-shrink-0">
@@ -473,7 +537,21 @@ const AsignacionLocalesPage = () => {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm text-yellow-700">
-                        Este usuario ya está asignado a <strong>{selectedUsers[0].local.nombre}</strong>. Si continúa, se reasignará al local seleccionado.
+                        {selectedUsers[0].locales && selectedUsers[0].locales.length > 0 ? (
+                          <>Este usuario ya está asignado a <strong>{selectedUsers[0].locales.length} {selectedUsers[0].locales.length === 1 ? 'local' : 'locales'}</strong>. 
+                            {selectedUsers[0].locales.map((local, index) => (
+                              <span key={local._id || local.id}>
+                                {index === 0 ? ' (' : ', '}
+                                <strong>{local.nombre || 'Local sin nombre'}</strong>
+                                {index === selectedUsers[0].locales.length - 1 ? ')' : ''}
+                              </span>
+                            ))}
+                          </>
+                        ) : (
+                          <>Este usuario ya está asignado a <strong>{selectedUsers[0].local.nombre}</strong>.</>
+                        )}
+                        {' '}Si continúa, se {selectedUsers[0].locales && selectedUsers[0].locales.length > 1 ? 'eliminarán estas asignaciones y se ' : ''}
+                        asignará al local <strong>{selectedLocal.nombre}</strong>.
                       </p>
                     </div>
                   </div>

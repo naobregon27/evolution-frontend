@@ -113,11 +113,26 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
             const role = getField(user, ['role', 'rol', 'userRole'], 'usuario');
             
             // Manejar campos anidados como local (que puede ser un objeto o un string)
-            let localValue = user.local;
-            if (typeof localValue === 'object' && localValue !== null) {
-              localValue = localValue.nombre || localValue.name || localValue.id || 'Sin asignar';
+            let localValue = 'Sin asignar';
+            
+            // Verificar si el usuario tiene la propiedad locales (array)
+            if (user.locales && Array.isArray(user.locales) && user.locales.length > 0) {
+              // Mostrar todos los nombres de locales separados por coma
+              localValue = user.locales.map(local => 
+                local.nombre || local.name || local.id || 'Local sin nombre'
+              ).join(', ');
+            } 
+            // Verificar si existe primaryLocal
+            else if (user.primaryLocal && typeof user.primaryLocal === 'object') {
+              localValue = user.primaryLocal.nombre || user.primaryLocal.name || user.primaryLocal.id || 'Local principal';
+            }
+            // Verificar la propiedad local tradicional
+            else if (user.local) {
+              if (typeof user.local === 'object' && user.local !== null) {
+                localValue = user.local.nombre || user.local.name || user.local.id || 'Local asignado';
             } else {
-              localValue = getField(user, ['local', 'localId', 'ubicacion'], 'Sin asignar');
+                localValue = user.local;
+              }
             }
             
             const imagenPerfil = getField(user, ['imagenPerfil', 'profileImage', 'avatar'], 'default.jpg');
@@ -252,11 +267,26 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
         const role = getField(user, ['role', 'rol', 'userRole'], 'usuario');
         
         // Manejar campos anidados como local
-        let localValue = user.local;
-        if (typeof localValue === 'object' && localValue !== null) {
-          localValue = localValue.nombre || localValue.name || localValue.id || 'Sin asignar';
+        let localValue = 'Sin asignar';
+        
+        // Verificar si el usuario tiene la propiedad locales (array)
+        if (user.locales && Array.isArray(user.locales) && user.locales.length > 0) {
+          // Mostrar todos los nombres de locales separados por coma
+          localValue = user.locales.map(local => 
+            local.nombre || local.name || local.id || 'Local sin nombre'
+          ).join(', ');
+        } 
+        // Verificar si existe primaryLocal
+        else if (user.primaryLocal && typeof user.primaryLocal === 'object') {
+          localValue = user.primaryLocal.nombre || user.primaryLocal.name || user.primaryLocal.id || 'Local principal';
+        }
+        // Verificar la propiedad local tradicional
+        else if (user.local) {
+          if (typeof user.local === 'object' && user.local !== null) {
+            localValue = user.local.nombre || user.local.name || user.local.id || 'Local asignado';
         } else {
-          localValue = getField(user, ['local', 'localId', 'ubicacion'], 'Sin asignar');
+            localValue = user.local;
+          }
         }
         
         const imagenPerfil = getField(user, ['imagenPerfil', 'profileImage', 'avatar'], 'default.jpg');

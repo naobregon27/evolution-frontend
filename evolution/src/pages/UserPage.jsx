@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../store/reducers/authReducer';
@@ -7,13 +7,31 @@ const UserPage = () => {
   const { isAuthenticated, userRole, user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [userLocales, setUserLocales] = useState([]);
 
   useEffect(() => {
     // Protección de ruta: Si no está autenticado, redirigir al login
     if (!isAuthenticated) {
       navigate('/login');
     }
-  }, [isAuthenticated, navigate]);
+
+    // Extraer los locales del usuario
+    if (user) {
+      if (user.locales && Array.isArray(user.locales)) {
+        // Si el usuario tiene la propiedad locales como array
+        setUserLocales(user.locales);
+        console.log("Usuario con múltiples locales:", user.locales);
+      } else if (user.local && typeof user.local === 'object') {
+        // Si el usuario tiene un solo local como objeto
+        setUserLocales([user.local]);
+        console.log("Usuario con un solo local:", user.local);
+      } else {
+        // No tiene locales asignados
+        setUserLocales([]);
+        console.log("Usuario sin locales asignados");
+      }
+    }
+  }, [isAuthenticated, navigate, user]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -39,16 +57,38 @@ const UserPage = () => {
           <div className="p-8">
             <div className="flex items-center mb-8 p-6 bg-green-50 rounded-lg">
               <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center text-white text-2xl font-bold mr-6">
-                {user?.name?.charAt(0) || 'U'}
+                {user?.nombre?.charAt(0) || user?.name?.charAt(0) || 'U'}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">{user?.name || 'Usuario'}</h2>
+                <h2 className="text-2xl font-bold text-gray-800">{user?.nombre || user?.name || 'Usuario'}</h2>
                 <p className="text-green-600 font-medium">{user?.email || 'usuario@example.com'}</p>
                 <div className="mt-1 inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                  Usuario
+                  {user?.role || 'Usuario'}
                 </div>
               </div>
             </div>
+
+            {/* Sección de Locales Asignados */}
+            {userLocales.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Mis Locales Asignados</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {userLocales.map((local, index) => (
+                    <div key={local.id || index} className="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                      <h4 className="font-bold text-teal-700">{local.nombre || 'Local sin nombre'}</h4>
+                      <p className="text-gray-600 text-sm">{local.direccion || 'Sin dirección'}</p>
+                      <p className="text-gray-600 text-sm">Tel: {local.telefono || 'No disponible'}</p>
+                      <p className="text-gray-600 text-sm">{local.email || 'Sin email'}</p>
+                      {user.primaryLocal && user.primaryLocal.id === local.id && (
+                        <div className="mt-2 inline-block bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">
+                          Local Principal
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">

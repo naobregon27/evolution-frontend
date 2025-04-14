@@ -108,7 +108,9 @@ function App() {
           {/* Rutas de SuperAdmin */}
           <Route path="/super-admin" element={
             requireAuth(
-              <SuperAdminPage />,
+              <Layout user={user} userRole={userRole}>
+                <SuperAdminPage />
+              </Layout>,
               'superAdmin'
             )
           } />
@@ -162,24 +164,22 @@ function App() {
           
           {/* Rutas de Admin */}
           <Route path="/admin" element={
-            <PageContainer className="admin-page">
-              <div className={`flex-1 flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                <div className={`w-full max-w-4xl p-8 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
-                  <AdminPage />
-                </div>
-              </div>
-            </PageContainer>
+            requireAuth(
+              <Layout user={user} userRole={userRole}>
+                <AdminPage />
+              </Layout>,
+              'admin'
+            )
           } />
           
           {/* Rutas de Usuario */}
           <Route path="/user" element={
-            <PageContainer className="user-page">
-              <div className={`flex-1 flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                <div className={`w-full max-w-4xl p-8 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
-                  <UserPage />
-                </div>
-              </div>
-            </PageContainer>
+            requireAuth(
+              <Layout user={user} userRole={userRole}>
+                <UserPage />
+              </Layout>,
+              'usuario'
+            )
           } />
           
           <Route path="*" element={<Navigate to="/" />} />

@@ -13,7 +13,7 @@ import {
   createUser, 
   updateUser, 
   deleteUser, 
-  updateUserStatus 
+  toggleUserStatus 
 } from '../services/userService';
 
 // Clave para guardar usuarios en localStorage
@@ -491,15 +491,11 @@ const UsersManagement = () => {
       const newStatus = !currentStatus;
       console.log(`Cambiando estado de: ${currentStatus} a: ${newStatus}`);
       
-      // El payload debe seguir exactamente el formato requerido por el backend
-      const statusPayload = { activo: newStatus }; 
-      console.log('Payload a enviar:', statusPayload);
+      // Llamar a la función correcta con los parámetros adecuados
+      const response = await toggleUserStatus(userId, newStatus);
       
-      // Intentar actualizar el estado del usuario - la función ahora verifica internamente la existencia
-      const response = await updateUserStatus(userId, statusPayload);
-      
-      if (response && response.data && response.data.success) {
-        console.log('Estado de usuario actualizado con éxito:', response.data);
+      if (response && response.success) {
+        console.log('Estado de usuario actualizado con éxito:', response);
         
         // Actualizar el usuario localmente en la lista de usuarios
         const updatedUsers = users.map(user => {

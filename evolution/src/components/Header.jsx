@@ -24,7 +24,7 @@ const Header = ({ user, onLogout }) => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <span className="mr-2">Usuario:</span>
-              <span className="font-medium">{user?.email || 'Usuario'}</span>
+              <span className="font-medium">{user?.nombre || user?.name || 'Nahuel Obregon'}</span>
             </div>
             
             <button 
@@ -68,7 +68,7 @@ const Header = ({ user, onLogout }) => {
             <div className="flex flex-col space-y-3">
               <div className="flex items-center py-2">
                 <span className="mr-2">Usuario:</span>
-                <span className="font-medium">{user?.email || 'Usuario'}</span>
+                <span className="font-medium">{user?.nombre || user?.name || 'Nahuel Obregon'}</span>
               </div>
               
               <button 

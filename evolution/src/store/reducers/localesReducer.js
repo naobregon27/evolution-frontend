@@ -83,16 +83,23 @@ export const deleteLocal = createAsyncThunk(
   'locales/deleteLocal',
   async (localId, { rejectWithValue }) => {
     try {
+      // Verificar que tenemos un ID válido
+      if (!localId) {
+        throw new Error('ID de local no válido');
+      }
+      
+      console.log(`Eliminando local ${localId} usando endpoint: /api/locales/${localId}`);
       const response = await localesService.deleteLocal(localId);
       
       // Procesamos la respuesta para extraer el local desde la estructura correcta
-      if (response && response.success) {
+      if (response && (response.success || response._id)) {
+        // Si tenemos éxito, devolvemos un objeto con el ID para actualizar el estado
         return { _id: localId, ...response.data };
       } else {
-        throw new Error('Error al eliminar el local');
+        throw new Error('Error al eliminar el local: Respuesta inválida del servidor');
       }
     } catch (error) {
-      console.error('Error en deleteLocal:', error);
+      console.error(`Error en deleteLocal (${localId}):`, error);
       return rejectWithValue(error.response?.data?.message || error.message || `Error al eliminar local con ID ${localId}`);
     }
   }

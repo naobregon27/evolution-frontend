@@ -151,11 +151,36 @@ export const updateUser = async (userId, userData) => {
 // Función para eliminar un usuario
 export const deleteUser = async (userId) => {
   try {
+    // Verificar que tenemos un ID válido
+    if (!userId) {
+      throw new Error('ID de usuario no válido');
+    }
+    
+    // Usar el endpoint exacto solicitado: /api/admin/users/{userId}
+    console.log(`Eliminando usuario con ID ${userId} usando endpoint: /api/admin/users/${userId}`);
+    
     const config = getAuthConfig();
     const response = await api.delete(`/api/admin/users/${userId}`, config);
-    return response.data;
+    
+    // Procesar la respuesta para manejar diferentes formatos posibles
+    if (response.data && response.data.success) {
+      console.log('Usuario eliminado con éxito:', response.data);
+      return {
+        success: true,
+        message: response.data.message || 'Usuario eliminado exitosamente',
+        data: response.data.data || { _id: userId }
+      };
+    } else {
+      // Si la respuesta no tiene un formato success:true estándar pero es correcta
+      return {
+        success: true,
+        message: 'Usuario eliminado exitosamente',
+        data: response.data || { _id: userId }
+      };
+    }
   } catch (error) {
     console.error(`Error al eliminar usuario con ID ${userId}:`, error);
+    console.error('Detalles del error:', error.response?.data);
     throw error;
   }
 };

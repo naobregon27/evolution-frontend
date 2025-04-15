@@ -1,4 +1,6 @@
 import api from './api';
+import store from '../store';
+import axios from 'axios';
 
 // Función para obtener configuración con token actual
 const getAuthConfig = () => {
@@ -8,6 +10,28 @@ const getAuthConfig = () => {
       Authorization: token ? `Bearer ${token}` : ''
     }
   };
+};
+
+// Función para obtener el ID del usuario actual
+const getCurrentUserId = () => {
+  // Primero intentar obtener desde Redux
+  const state = store.getState();
+  if (state?.auth?.user?._id) {
+    return state.auth.user._id;
+  }
+  
+  // Si no está en Redux, intentar obtenerlo del localStorage
+  try {
+    const currentUserStr = localStorage.getItem('user');
+    if (currentUserStr) {
+      const currentUser = JSON.parse(currentUserStr);
+      return currentUser?._id || currentUser?.id;
+    }
+  } catch (e) {
+    console.error('Error al parsear usuario del localStorage:', e);
+  }
+  
+  return null;
 };
 
 export const authService = {
@@ -78,9 +102,39 @@ export const authService = {
   
   async changePassword(passwordData) {
     try {
-      const response = await api.post('/api/users/change-password', passwordData);
+      // Usar el endpoint correcto según lo indicado por el cliente
+      console.log('Enviando solicitud para cambiar contraseña...');
+      
+      // El endpoint correcto es /api/users/change-password con método PUT
+      const payload = {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+        confirmPassword: passwordData.confirmPassword
+      };
+      
+      // Obtener configuración con el token del usuario logueado
+      const config = getAuthConfig();
+      console.log('Token incluido en la petición:', config.headers.Authorization ? 'Sí' : 'No');
+      
+      // URL deployada del backend
+      const deployedUrl = 'https://evolution-backend-flhq.onrender.com/api/users/change-password';
+      
+      console.log(`Intentando con URL: ${deployedUrl} usando método PUT`);
+      
+      // Usar método PUT en lugar de POST
+      const response = await axios.put(deployedUrl, payload, config);
+      
+      console.log('¡Respuesta exitosa!');
+      console.log('Respuesta del servidor:', {
+        status: response.status,
+        success: !!response.data?.success,
+        message: response.data?.message || 'No message provided'
+      });
+      
       return response.data;
     } catch (error) {
+      console.error('Error al cambiar la contraseña:', error.response?.status || error.message);
+      console.error('Detalles del error:', error.response?.data);
       throw error.response?.data || { message: 'Error al cambiar la contraseña' };
     }
   }

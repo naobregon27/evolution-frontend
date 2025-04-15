@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaFilter } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 // Importar componentes
 import UserTable from '../components/UserTable';
@@ -540,23 +541,66 @@ const UsersManagement = () => {
         throw new Error('No se pudo identificar el ID del usuario a eliminar');
       }
       
-      console.log(`Eliminando usuario con ID ${userId}`);
-      const response = await deleteUser(userId);
-      console.log('Usuario eliminado con éxito, respuesta:', response);
+      console.log(`Eliminando usuario con ID ${userId} usando endpoint: /api/admin/users/${userId}`);
       
-      setShowConfirmDelete(false);
-      setUserToDelete(null);
-      fetchUsers(); // Recargar la lista de usuarios
+      // Mostrar información del usuario que se está eliminando
+      console.log('Datos del usuario a eliminar:', JSON.stringify(userToDelete, null, 2));
+      
+      // Realizar la petición de eliminación
+      const response = await deleteUser(userId);
+      console.log('Respuesta del servidor:', response);
+      
+      // Verificar si la operación fue exitosa
+      if (response && (response.success || response.data)) {
+        console.log('Usuario eliminado con éxito');
+        
+        // Actualizar la lista de usuarios localmente para reflejar la eliminación
+        const updatedUsers = users.filter(user => {
+          // Identificar usuarios por su ID (puede estar en _id o id)
+          const userId1 = user._id || user.id;
+          const userId2 = userToDelete._id || userToDelete.id;
+          return userId1 !== userId2;
+        });
+        
+        // Actualizar el estado y la caché
+        setUsers(updatedUsers);
+        saveUsersToCache(updatedUsers);
+        
+        // Reiniciar el estado y cerrar el modal
+        setShowConfirmDelete(false);
+        setUserToDelete(null);
+        
+        // Mostrar mensaje de éxito
+        const successMessage = response.message || 'Usuario eliminado exitosamente';
+        toast.success(successMessage);
+      } else {
+        // Si la respuesta no indica éxito pero tampoco lanzó un error
+        throw new Error('La respuesta del servidor no indica éxito en la operación');
+      }
     } catch (error) {
       console.error('Error detallado en confirmDeleteUser:', error);
       
       // Proporcionar un mensaje de error más específico si está disponible
+      let errorMessage = 'Error al eliminar el usuario';
+      
       if (error.response && error.response.data) {
-        const errorMsg = error.response.data.message || error.response.data.error || error.message;
-        setError(`Error al eliminar el usuario: ${errorMsg}`);
-      } else {
-        setError(`Error al eliminar el usuario: ${error.message}`);
+        if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        } else if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
       }
+      
+      // Mostrar el error al usuario
+      setError(`Error al eliminar el usuario: ${errorMessage}`);
+      toast.error(`Error: ${errorMessage}`);
+      
+      // No cerrar el modal si hay un error
+      setShowConfirmDelete(false);
     } finally {
       setIsLoading(false);
     }

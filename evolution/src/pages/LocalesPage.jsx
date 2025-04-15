@@ -277,18 +277,6 @@ const LocalesPage = () => {
     setShowForm(false);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('¿Está seguro que desea eliminar este local?')) {
-      if (useMockData) {
-        setMockLocales(mockLocales.filter(local => local._id !== id));
-        toast.success('Local eliminado exitosamente');
-      } else {
-        dispatch(deleteLocal(id));
-      }
-      setViewMode('list');
-    }
-  };
-
   const handleAddNew = () => {
     setEditingLocal(null);
     setShowForm(true);
@@ -320,22 +308,41 @@ const LocalesPage = () => {
       }, 1000);
     } else {
       try {
-        await dispatch(deleteLocal(editingLocal._id));
+        const localId = editingLocal._id;
+        console.log(`Eliminando local con ID: ${localId} usando endpoint: /api/locales/${localId}`);
+        
+        // Utilizamos el action creator de Redux para eliminar el local
+        const resultAction = await dispatch(deleteLocal(localId)).unwrap();
+        console.log('Resultado de eliminación:', resultAction);
+        
+        // Mostrar mensaje de éxito
+        toast.success('Local eliminado exitosamente');
+        
+        // Actualizar la UI después de eliminar exitosamente
         setAlert({
           show: true,
           type: 'success',
           message: 'Local eliminado con éxito'
         });
+        
+        // Cerrar el modal y limpiar el estado
         setShowDeleteConfirm(false);
         setEditingLocal(null);
-        setIsProcessing(false);
+        
+        // Volver a la vista de lista
+        setViewMode('list');
+        
       } catch (error) {
         console.error('Error al eliminar local:', error);
+        // Mostrar toast con el error
+        toast.error(error.response?.data?.message || error.message || 'Error al eliminar el local');
+        
         setAlert({
           show: true,
           type: 'error',
-          message: 'Error al eliminar el local. Por favor, inténtelo de nuevo.'
+          message: error.response?.data?.message || error.message || 'Error al eliminar el local. Por favor, inténtelo de nuevo.'
         });
+      } finally {
         setIsProcessing(false);
       }
     }

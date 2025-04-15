@@ -49,10 +49,20 @@ const localesService = {
   // Eliminar un local
   deleteLocal: async (localId) => {
     try {
+      // Usar el endpoint exacto solicitado: /api/locales/{localId}
       const response = await api.delete(`/api/locales/${localId}`);
-      return { _id: localId, ...response.data };
+      
+      // Procesamos la respuesta para retornar datos estructurados
+      // Incluimos el ID en la respuesta para facilitar la gestión en el reducers
+      if (response.data && response.data.success) {
+        return response.data;
+      } else {
+        // Asegurar que siempre devolvemos un objeto con el id incluso si la respuesta no es estándar
+        return { _id: localId, success: true, data: response.data };
+      }
     } catch (error) {
       console.error(`Error al eliminar local con ID ${localId}:`, error);
+      console.error('Detalles del error:', error.response?.data);
       throw error;
     }
   },
